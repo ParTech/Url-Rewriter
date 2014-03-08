@@ -34,7 +34,7 @@ The rewrite rules are stored as Sitecore items in the */system/Modules/URL Rewri
 They are loaded into memory just once when Sitecore is started and will not be reloaded until the URL rewriter cache is cleared (see *Clearing the cache*).  
 You can manage two types of rewrite rules: *URL rewrite rules* and *Hostname rewrite rules*.  
 
-**How to use URL rewrite rules**
+**How to use URL rewrite rules**  
 URL rewrite rules allow you to rewrite the entire request URL.  
 You must at least specify a **relative URL**, so / would be the minimum valid value.  
 If you specify a hostname, you must specify an **absolute URL**, including the protocol prefix (e.g. http://www.mydomain.com/).  
@@ -59,7 +59,7 @@ Target URL = 'http://www.target.com/my-new-page.aspx?my-explicit=querystring'
 In that case, a request to: http://www.source.com/my-old-page.html*?myquery=value*  
 will be redirected to: http://www.target.com/my-new-page.aspx*?my-explicit=querystring*  
 
-**How to use Hostname rewrite rules**
+**How to use Hostname rewrite rules**  
 Hostname rewrite rules allow you to rewrite the hostname of a request, while keeping the rest of the URL intact.  
 You must specify only the hostnames (or IP-addresses), no other values such as protocol prefix or path.  
 
@@ -70,12 +70,12 @@ Target hostname = 'www.mynewdomain.com'
 In this case, a request to: http://*www.sourcedomain.com*/my-path/my-document.html?my=querystring  
 will be redirected to: http://*www.mynewdomain.com*/my-path/my-document.html?my=querystring
 
-**Clearing the cache**
+**Clearing the cache**  
 The cache is populated during the first request after the Sitecore instance is started.  
 If you make changes to rewrite rules, you need to clear the cache using the 'Clear cache' button in the Publish ribbon.  
 Note that you need to have publishing rights in order to see this button.  
 
-**Configuration**
+**Configuration**  
 
 
 
