@@ -2,9 +2,9 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using Sitecore.Data.Items;
-using Sitecore.Data;
 using System.Text.RegularExpressions;
+using Sitecore.Data;
+using Sitecore.Data.Items;
 
 namespace ParTech.Modules.UrlRewriter.Models
 {

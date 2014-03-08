@@ -1,12 +1,12 @@
 ﻿using System;
+using ParTech.Modules.UrlRewriter.Events;
 using Sitecore.Eventing;
 using Sitecore.Events.Hooks;
-using ParTech.Modules.UrlRewriter.Events;
 
 namespace ParTech.Modules.UrlRewriter.Hooks
 {
     /// <summary>
-    /// Hook that subscribes the CacheFlushEvent to the EventQueue.
+    /// Hook that subscribes the ClearCacheEvent to the EventQueue.
     /// </summary>
     public class ClearCacheHook : IHook
     {

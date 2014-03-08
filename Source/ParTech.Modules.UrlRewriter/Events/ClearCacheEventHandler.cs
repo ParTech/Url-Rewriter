@@ -1,6 +1,6 @@
 ﻿using System;
-using Sitecore.Events;
 using ParTech.Modules.UrlRewriter.Pipelines;
+using Sitecore.Events;
 
 namespace ParTech.Modules.UrlRewriter.Events
 {

@@ -5,8 +5,8 @@ using System.Text;
 using System.Xml;
 using Sitecore.Collections;
 using Sitecore.Configuration;
-using Sitecore.Diagnostics;
 using Sitecore.Data;
+using Sitecore.Diagnostics;
 
 namespace ParTech.Modules.UrlRewriter
 {
