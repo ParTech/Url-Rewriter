@@ -39,13 +39,13 @@ Target URL = `http://www.target.com/my-new-page.aspx`
 In this case, a request to: `http://www.source.com/my-old-page.html`  
 will be redirected to: `http://www.target.com/my-new-page.aspx`  
   
-The querystring is kept intact, so a request to: http://www.source.com*/my-old-page.html?myquery=value*  
-will be redirected to: http://www.target.com*/my-new-page.aspx?myquery=value*  
+The querystring is kept intact, so a request to: `http://www.source.com/my-old-page.html?myquery=value`  
+will be redirected to: `http://www.target.com/my-new-page.aspx?myquery=value`  
   
 If a querystring was defined on the target URL, it will overwrite any existing querystring:  
   
-Source URL = 'http://www.source.com/my-old-page.html'  
-Target URL = 'http://www.target.com/my-new-page.aspx?my-explicit=querystring'  
+Source URL = `http://www.source.com/my-old-page.html`  
+Target URL = `http://www.target.com/my-new-page.aspx?my-explicit=querystring`  
   
 In that case, a request to: `http://www.source.com/my-old-page.html?myquery=value`  
 will be redirected to: `http://www.target.com/my-new-page.aspx`?my-explicit=querystring`  
