@@ -64,7 +64,7 @@ Hostname rewrite rules allow you to rewrite the hostname of a request, while kee
 You must specify only the hostnames (or IP-addresses), no other values such as protocol prefix or path.  
 
 Example:  
-Source hostname = 'www.sourcedomain.com'  
+Source hostname = '`www.sourcedomain.com`'  
 Target hostname = 'www.mynewdomain.com'
 
 In this case, a request to: http://*www.sourcedomain.com*/my-path/my-document.html?my=querystring  
@@ -72,7 +72,7 @@ will be redirected to: http://*www.mynewdomain.com*/my-path/my-document.html?my=
 
 **Clearing the cache**  
 The cache is populated during the first request after the Sitecore instance is started.  
-If you make changes to rewrite rules, you need to clear the cache using the 'Clear cache' button in the Publish ribbon.  
+If you make changes to rewrite rules, you need to clear the cache using the 'Clear cache' button in the Publish ribbon, otherwise the changes will not be applied.  
 Note that you need to have publishing rights in order to see this button.  
 
 **Configuration**  
