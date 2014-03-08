@@ -6,8 +6,11 @@ It supports rewriting of hostnames, relative URL's and absolute URL's.
 
 
 ## Screenshots
+*Managing a URL rewrite rule in Sitecore*  
 ![alt text](https://raw.github.com/ParTech/Url-Rewriter/master/Screenshots/url-rewrite-rule_small.png "Managing a URL rewrite rule in Sitecore.")
-![alt text](https://raw.github.com/ParTech/Url-Rewriter/master/Screenshots/hostname-rewrite-rule_small.png "Managing a URL rewrite rule in Sitecore.")
+
+*Managing a Hostname rewrite rule in Sitecore*  
+![alt text](https://raw.github.com/ParTech/Url-Rewriter/master/Screenshots/hostname-rewrite-rule_small.png "Managing a Hostname rewrite rule in Sitecore.")
 
 
 ## Installation
@@ -53,7 +56,7 @@ Source URL = `http://www.source.com/my-old-page.html`
 Target URL = `http://www.target.com/my-new-page.aspx?my-explicit=querystring`  
   
 In that case, a request to: `http://www.source.com/my-old-page.html?myquery=value`  
-will be redirected to: `http://www.target.com/my-new-page.aspx`?my-explicit=querystring`  
+will be redirected to: `http://www.target.com/my-new-page.aspx?my-explicit=querystring`  
 
 ### How to use Hostname rewrite rules  
 Hostname rewrite rules allow you to rewrite the hostname of a request, while keeping the rest of the URL intact.  
