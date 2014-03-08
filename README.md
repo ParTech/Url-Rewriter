@@ -5,6 +5,11 @@ This module enables administrator or editors to manage URL rewrite rules from wi
 It supports rewriting of hostnames, relative URL's and absolute URL's.
 
 
+## Screenshots
+![alt text](https://raw.github.com/ParTech/Url-Rewriter/master/Screenshots/url-rewrite-rule_small.png "Managing a URL rewrite rule in Sitecore.")
+![alt text](https://raw.github.com/ParTech/Url-Rewriter/master/Screenshots/hostname-rewrite-rule_small.png "Managing a URL rewrite rule in Sitecore.")
+
+
 ## Installation
 The Sitecore package *\Release\ParTech.Modules.UrlRewriter-1.0.0.zip* contains:
 - Binary (release build).
