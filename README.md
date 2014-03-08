@@ -65,11 +65,11 @@ will be redirected to: `http://www.mynewdomain.com/my-path/my-document.html?my=q
 The cache is populated during the first request after the Sitecore instance is started.  
 If you make changes to rewrite rules, you need to clear the cache using the *Clear cache* button in the Publish ribbon, otherwise the changes will not be applied.  
 Note that you need to have publishing rights in order to see this button.  
-IF you are using a multi-instance environment (i.e. you have separate Content Management and Content Delivery instances), the cache is cleared on all the instances.  
+If you are using a multi-instance environment (i.e. you have separate Content Management and Content Delivery instances), the cache is cleared on all the instances (assuming that EventQueues are enabled).  
 
 ### Configuration  
 All the configuration related to this module is stored in the */App_Config/Includes/ParTech.Modules.UrlRewriter.config* include file.  
-The settings are documented in that file and don't need further explanation in this document.  
+The settings are commented in that file and don't need further explanation in this document.  
 
 
 ## Release notes
