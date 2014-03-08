@@ -1,14 +1,11 @@
 # URL Rewriter Module
-=======================
 
 ## Description
------------
 This module enables administrator or editors to manage URL rewrite rules from within the Sitecore client.  
 It supports rewriting of hostnames, relative URL's and absolute URL's.
 
 
 ## Installation
-------------
 The Sitecore package *\Release\ParTech.Modules.UrlRewriter-1.0.0.zip* contains:
 - Binary (release build).
 - Configuration include file.
@@ -24,7 +21,6 @@ You will need to setup your own rewrite rules after the installation has succeed
 
 
 ## Usage
------
 The rewrite rules are stored as Sitecore items in the */sitecore/System/Modules/URL Rewriter rules* folder.  
 They are loaded into memory when Sitecore is started and will not be reloaded until the URL Rewriter cache is cleared (see *Clearing the cache*).  
 You can manage two types of rewrite rules: *URL rewrite rules* and *Hostname rewrite rules*.  
@@ -77,19 +73,16 @@ The settings are documented in that file and don't need further explanation in t
 
 
 ## Release notes
--------------
 *1.0.0*
 - Initial release
 
 
 ## References
-------------
 Blog: -  
 GitHub: https://github.com/ParTech/Url-Rewriter
 
 
 ## Author
-------
 This solution was brought to you and is supported by Ruud van Falier, ParTech IT
 
 Twitter: @BrruuD / @ParTechIT   
