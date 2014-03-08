@@ -78,7 +78,7 @@ The settings are commented in that file and don't need further explanation in th
 
 
 ## References
-Blog: -  
+Blog: http://www.partechit.nl/nl/blog/2014/03/sitecore-url-rewriter-module  
 GitHub: https://github.com/ParTech/Url-Rewriter
 
 

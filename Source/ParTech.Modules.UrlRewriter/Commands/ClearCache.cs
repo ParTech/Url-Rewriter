@@ -39,7 +39,7 @@ namespace ParTech.Modules.UrlRewriter.Commands
                 Event.RaiseEvent("urlrewriter:clearcache", new ClearCacheEventArgs(new ClearCacheEvent()));
 
                 // Add a ClearCacheEvent to the EventQueue to clear the cache on all instances.
-                Sitecore.Eventing.EventManager.QueueEvent<ClearCacheEvent>(new ClearCacheEvent(), true, true);
+                Sitecore.Eventing.EventManager.QueueEvent<ClearCacheEvent>(new ClearCacheEvent(), true, false);
             }
         }
     }

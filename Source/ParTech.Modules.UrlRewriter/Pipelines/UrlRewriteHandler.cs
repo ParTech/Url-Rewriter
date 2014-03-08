@@ -40,10 +40,9 @@ namespace ParTech.Modules.UrlRewriter.Pipelines
         /// <param name="args"></param>
         public override void Process(HttpRequestArgs args)
         {
-            bool isGetRequest = args.Context.Request.HttpMethod.Equals("get", StringComparison.InvariantCultureIgnoreCase);
-
-            // Only rewrite GET requests and ignore all requests to the Sitecore Client.
-            if (this.IsSitecoreClientRequest() || !isGetRequest)
+            // Ignore requests that are not GET requests,
+            // have the context database set to Core or point to ignored sites
+            if (this.IgnoreRequest(args.Context))
             {
                 return;
             }
@@ -318,12 +317,22 @@ namespace ParTech.Modules.UrlRewriter.Pipelines
         }
 
         /// <summary>
-        /// Indicates whether the current request is a request to the Sitecore Client.
+        /// Indicates whether the current request must be ignored by the URL Rewriter module.
         /// </summary>
         /// <returns></returns>
-        private bool IsSitecoreClientRequest()
+        private bool IgnoreRequest(HttpContext httpContext)
         {
-            return false;
+            // Only GET request can be rewritten.
+            bool isGetRequest = httpContext.Request.HttpMethod.Equals("get", StringComparison.InvariantCultureIgnoreCase);
+
+            // Check if the context database is set to Core.
+            bool isCoreDatabase = Sitecore.Context.Database != null 
+                && Sitecore.Context.Database.Name.Equals(Settings.CoreDatabase, StringComparison.InvariantCultureIgnoreCase);
+
+            // CHeck if the context site is in the list of ignored sites.
+            bool isIgnoredSite = Settings.IgnoreForSites.Contains(Sitecore.Context.GetSiteName().ToLower());
+            
+            return !isGetRequest || isCoreDatabase || isIgnoredSite;
         }
         #endregion
     }

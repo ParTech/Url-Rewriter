@@ -74,15 +74,20 @@ namespace ParTech.Modules.UrlRewriter
         /// <param name="name"></param>
         /// <param name="required">Indicates whether to throw an exception if the setting could not be found.</param>
         /// <returns></returns>
-        public string GetString(string name, bool required = true)
+        public string GetString(string name, bool required = true, string defaultValue = null)
         {
             Assert.ArgumentNotNull(name, "name");
 
             string value = this.settingValues[name.ToLower()];
 
-            if (string.IsNullOrEmpty(value) && required)
+            if (string.IsNullOrEmpty(value))
             {
-                throw new UrlRewriterException("URL Rewriter setting '{0}' could not be found and is required.", name);
+                if (required)
+                {
+                    throw new UrlRewriterException("URL Rewriter setting '{0}' could not be found and is required.", name);
+                }
+
+                value = defaultValue;
             }
 
             return value;
@@ -94,14 +99,19 @@ namespace ParTech.Modules.UrlRewriter
         /// <param name="name"></param>
         /// <param name="required">Indicates whether to throw an exception if the setting could not be found or parsed.</param>
         /// <returns></returns>
-        public bool GetBoolean(string name, bool required = true)
+        public bool GetBoolean(string name, bool required = true, bool defaultValue = false)
         {
             string value = this.GetString(name, required);
             bool result;
             
-            if (!bool.TryParse(value, out result) && required)
+            if (!bool.TryParse(value, out result))
             {
-                throw new UrlRewriterException("URL Rewriter setting '{0}' is required and has an invalid value (boolean expected).", name);
+                if (required)
+                {
+                    throw new UrlRewriterException("URL Rewriter setting '{0}' is required and has an invalid value (boolean expected).", name);
+                }
+
+                result = defaultValue;
             }
 
             return result;
@@ -141,12 +151,30 @@ namespace ParTech.Modules.UrlRewriter
         /// <summary>
         /// Gets a value indicating whether to write an entry to the Sitecore log every time a URL is rewritten.
         /// </summary>
-        public static bool LogRewrites { get { return settings.GetBoolean("LogRewrites"); } }
+        public static bool LogRewrites { get { return settings.GetBoolean("LogRewrites", false, false); } }
 
         /// <summary>
         /// Gets a value indicating whether the URL Rewriter Module has been enabled.
         /// </summary>
-        public static bool Enabled { get { return settings.GetBoolean("Enabled"); } }
+        public static bool Enabled { get { return settings.GetBoolean("Enabled", false, false); } }
+
+        /// <summary>
+        /// Gets the name of the Core database.
+        /// </summary>
+        public static string CoreDatabase { get { return settings.GetString("CoreDatabase", false, "core"); } }
+
+        /// <summary>
+        /// Gets an array with site names for which URL rewriting must be skipped.
+        /// </summary>
+        public static string[] IgnoreForSites 
+        { 
+            get 
+            { 
+                return settings.GetString("IgnoreForSites", false, "shell,login")
+                    .ToLower()
+                    .Split(new [] { ',' }, StringSplitOptions.RemoveEmptyEntries); 
+            } 
+        }
         #endregion
     }
 }
