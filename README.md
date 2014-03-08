@@ -64,10 +64,10 @@ Hostname rewrite rules allow you to rewrite the hostname of a request, while kee
 You must specify only the hostnames (or IP-addresses), no other values such as protocol prefix or path.  
 
 Example:  
-Source hostname = '`www.sourcedomain.com`'  
-Target hostname = 'www.mynewdomain.com'
+Source hostname = `www.sourcedomain.com`  
+Target hostname = `www.mynewdomain.com`
 
-In this case, a request to: http://*www.sourcedomain.com*/my-path/my-document.html?my=querystring  
+In this case, a request to: `http://*www.sourcedomain.com*/my-path/my-document.html?my=querystring`  
 will be redirected to: http://*www.mynewdomain.com*/my-path/my-document.html?my=querystring
 
 **Clearing the cache**  
