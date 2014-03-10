@@ -14,7 +14,7 @@ It supports rewriting of hostnames, relative URL's and absolute URL's.
 
 
 ## Installation
-The Sitecore package *\Release\ParTech.Modules.UrlRewriter-1.0.0.zip* contains:
+The Sitecore package *[\Release\ParTech.Modules.UrlRewriter-1.0.0.zip](https://github.com/ParTech/Url-Rewriter/raw/master/Release/ParTech.Modules.UrlRewriter-1.0.0.zip)* contains:
 - Binary (release build).
 - Configuration include file.
 - Core items that add a new command to the Publish ribbon in the Content Editor.
