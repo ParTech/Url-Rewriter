@@ -1,23 +1,22 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Net;
-using System.Text;
-using System.Web;
-using ParTech.Modules.UrlRewriter.Models;
-using Sitecore.Data;
-using Sitecore.Data.Items;
-using Sitecore.Pipelines.HttpRequest;
-using Sitecore.Sites;
-
-namespace ParTech.Modules.UrlRewriter.Pipelines
+﻿namespace ParTech.Modules.UrlRewriter.Pipelines
 {
+    using System;
+    using System.Collections.Generic;
+    using System.Linq;
+    using System.Net;
+    using System.Web;
+    using ParTech.Modules.UrlRewriter.Models;
+    using Sitecore;
+    using Sitecore.Data.Items;
+    using Sitecore.Pipelines.HttpRequest;
+
     /// <summary>
     /// Pipeline processor that processes URL rewriter rules.
     /// </summary>
     public class UrlRewriteHandler : HttpRequestProcessor
     {
         #region Cache objects
+
         /// <summary>
         /// Cache for <see cref="UrlRewriteRule"/> objects.
         /// </summary>
@@ -31,34 +30,9 @@ namespace ParTech.Modules.UrlRewriter.Pipelines
         /// <summary>
         /// Indicates whether the rewrite rules have been loaded from Sitecore.
         /// </summary>
-        private static bool rewriteRulesLoaded = false;
+        private static bool rewriteRulesLoaded;
+
         #endregion
-
-        /// <summary>
-        /// Executes the pipeline processor.
-        /// </summary>
-        /// <param name="args"></param>
-        public override void Process(HttpRequestArgs args)
-        {
-            // Ignore requests that are not GET requests,
-            // have the context database set to Core or point to ignored sites
-            if (this.IgnoreRequest(args.Context))
-            {
-                return;
-            }
-            
-            // Load the rewrite rules from Sitecore into the cache.
-            this.LoadRewriteRules(args);
-
-            // Rewrite URL's that contain trailing slashes if configuration allows it.
-            this.RewriteTrailingSlash(args);
-
-            // Try to tewrite the request URL based on URL rewrite rules.
-            this.RewriteUrl(args);
-
-            // Try to rewrite the request URL based on Hostname rewrite rules.
-            this.RewriteHostName(args);
-        }
 
         /// <summary>
         /// Clears the cache so the rewrite rules will be reloaded on the next request.
@@ -73,7 +47,34 @@ namespace ParTech.Modules.UrlRewriter.Pipelines
             Logging.LogInfo("Cleared rewriter rules cache.", typeof(UrlRewriteHandler));
         }
 
+        /// <summary>
+        /// Executes the pipeline processor.
+        /// </summary>
+        /// <param name="args"></param>
+        public override void Process(HttpRequestArgs args)
+        {
+            // Ignore requests that are not GET requests,
+            // have the context database set to Core or point to ignored sites
+            if (this.IgnoreRequest(args.Context))
+            {
+                return;
+            }
+
+            // Load the rewrite rules from Sitecore into the cache.
+            this.LoadRewriteRules(args);
+
+            // Rewrite URL's that contain trailing slashes if configuration allows it.
+            this.RewriteTrailingSlash(args);
+
+            // Try to tewrite the request URL based on URL rewrite rules.
+            this.RewriteUrl(args);
+
+            // Try to rewrite the request URL based on Hostname rewrite rules.
+            this.RewriteHostName(args);
+        }
+
         #region Rules loading methods
+
         /// <summary>
         /// Load the rewrite rules from Sitecore.
         /// </summary>
@@ -88,14 +89,14 @@ namespace ParTech.Modules.UrlRewriter.Pipelines
             }
 
             // Verify that we can access the context database.
-            if (Sitecore.Context.Database == null)
+            if (Context.Database == null)
             {
                 Logging.LogError("Cannot load URL rewrite rules because the Sitecore context database is not set.", this);
                 return;
             }
 
             // Load the rules folder item from Sitecore and verify that it exists.
-            Item rulesFolder = Sitecore.Context.Database.GetItem(Settings.RulesFolderId);
+            Item rulesFolder = Context.Database.GetItem(Settings.RulesFolderId);
 
             if (rulesFolder == null)
             {
@@ -142,9 +143,11 @@ namespace ParTech.Modules.UrlRewriter.Pipelines
                 }
             }
         }
+
         #endregion
 
         #region Rewrite methods
+
         /// <summary>
         /// If configuration allows it and the request URL ends with a slash, 
         /// the URL is rewritten to one without trailing slash.
@@ -197,7 +200,7 @@ namespace ParTech.Modules.UrlRewriter.Pipelines
             // Extract the hostname from the request URL.
             Uri requestUrl = args.Context.Request.Url;
             string hostName = requestUrl.Host;
-            
+
             // Check if there is a hostname rewrite rule that matches the requested hostname.
             HostNameRewriteRule rule = hostNameRewriteRulesCache
                 .FirstOrDefault(x => x.SourceHostName.Equals(hostName, StringComparison.InvariantCultureIgnoreCase));
@@ -279,15 +282,17 @@ namespace ParTech.Modules.UrlRewriter.Pipelines
             // Return a permanent redirect to the target URL.
             this.Redirect(targetUrl, args.Context);
         }
+
         #endregion
 
         #region Helper methods
+
         /// <summary>
         /// Compares the components of two URL's and returns true if they are equal.
         /// </summary>
-        /// <param name="a"></param>
-        /// <param name="b"></param>
-        /// <param name="components"></param>
+        /// <param name="a">First URL to compare.</param>
+        /// <param name="b">Second URL to compare.</param>
+        /// <param name="components">The URI components to compare.</param>
         /// <returns></returns>
         private bool EqualUrl(Uri a, Uri b, UriComponents components)
         {
@@ -300,7 +305,8 @@ namespace ParTech.Modules.UrlRewriter.Pipelines
         /// <summary>
         /// Redirect to the URL using HTTP status code 301 (permanent redirect).
         /// </summary>
-        /// <param name="url"></param>
+        /// <param name="url">The URL.</param>
+        /// <param name="httpContext">The HTTP context.</param>
         private void Redirect(string url, HttpContext httpContext)
         {
             if (httpContext == null)
@@ -319,21 +325,23 @@ namespace ParTech.Modules.UrlRewriter.Pipelines
         /// <summary>
         /// Indicates whether the current request must be ignored by the URL Rewriter module.
         /// </summary>
+        /// <param name="httpContext">The HTTP context.</param>
         /// <returns></returns>
         private bool IgnoreRequest(HttpContext httpContext)
         {
             // Only GET request can be rewritten.
-            bool isGetRequest = httpContext.Request.HttpMethod.Equals("get", StringComparison.InvariantCultureIgnoreCase);
+            bool getRequest = httpContext.Request.HttpMethod.Equals("get", StringComparison.InvariantCultureIgnoreCase);
 
             // Check if the context database is set to Core.
-            bool isCoreDatabase = Sitecore.Context.Database != null 
-                && Sitecore.Context.Database.Name.Equals(Settings.CoreDatabase, StringComparison.InvariantCultureIgnoreCase);
+            bool coreDatabase = Context.Database != null
+                && Context.Database.Name.Equals(Settings.CoreDatabase, StringComparison.InvariantCultureIgnoreCase);
 
             // CHeck if the context site is in the list of ignored sites.
-            bool isIgnoredSite = Settings.IgnoreForSites.Contains(Sitecore.Context.GetSiteName().ToLower());
-            
-            return !isGetRequest || isCoreDatabase || isIgnoredSite;
+            bool ignoredSite = Settings.IgnoreForSites.Contains(Context.GetSiteName().ToLower());
+
+            return !getRequest || coreDatabase || ignoredSite;
         }
+
         #endregion
     }
 }

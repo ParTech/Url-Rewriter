@@ -1,12 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using Sitecore.Data;
-using Sitecore.Data.Items;
-
-namespace ParTech.Modules.UrlRewriter.Models
+﻿namespace ParTech.Modules.UrlRewriter.Models
 {
+    using System;
+    using Sitecore.Data;
+    using Sitecore.Data.Items;
+
     /// <summary>
     /// Represents a URL rewriting rule.
     /// </summary>
@@ -19,7 +16,7 @@ namespace ParTech.Modules.UrlRewriter.Models
         /// Expected format is a relative or absolute URL (including protocol and hostname) and optionally a querystring.
         /// e.g. /myfolder/mypage.html or http://www.mydomain.com/myfolder/mypage.html
         /// </remarks>
-        private string sourceUrl;
+        private readonly string sourceUrl;
 
         /// <summary>
         /// Sitecore field value for the target URL.
@@ -28,7 +25,7 @@ namespace ParTech.Modules.UrlRewriter.Models
         /// Expected format is a relative or absolute URL (including protocol and hostname) and optionally a querystring.
         /// e.g. /myfolder/mypage.html or http://www.mydomain.com/myfolder/mypage.html
         /// </remarks>
-        private string targetUrl;
+        private readonly string targetUrl;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="UrlRewriteRule" /> class.
@@ -58,7 +55,7 @@ namespace ParTech.Modules.UrlRewriter.Models
 
             if (!Uri.IsWellFormedUriString(absoluteSourceUrl, UriKind.Absolute))
             {
-                Logging.LogError(string.Format("Source URL '{0}' defined in rewrite rule item '{1}' is not well formed.", absoluteSourceUrl, ItemId), this);
+                Logging.LogError(string.Format("Source URL '{0}' defined in rewrite rule item '{1}' is not well formed.", absoluteSourceUrl, this.ItemId), this);
                 return default(Uri);
             }
 
@@ -76,13 +73,13 @@ namespace ParTech.Modules.UrlRewriter.Models
 
             if (!Uri.IsWellFormedUriString(absoluteTargetUrl, UriKind.Absolute))
             {
-                Logging.LogError(string.Format("Target URL '{0}' defined in rewrite rule item '{1}' is not well formed.", absoluteTargetUrl, ItemId), this);
+                Logging.LogError(string.Format("Target URL '{0}' defined in rewrite rule item '{1}' is not well formed.", absoluteTargetUrl, this.ItemId), this);
                 return default(Uri);
             }
 
             return new Uri(absoluteTargetUrl);
         }
-        
+
         /// <summary>
         /// Validate the values of this rule and write an error to the Sitecore log if it's invalid.
         /// </summary>

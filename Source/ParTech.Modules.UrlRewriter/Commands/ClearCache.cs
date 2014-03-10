@@ -1,13 +1,12 @@
-﻿using ParTech.Modules.UrlRewriter.Events;
-using ParTech.Modules.UrlRewriter.Pipelines;
-using Sitecore;
-using Sitecore.Events;
-using Sitecore.Shell.Applications.Dialogs.ProgressBoxes;
-using Sitecore.Shell.Framework.Commands;
-using Sitecore.Web.UI.Sheer;
-
-namespace ParTech.Modules.UrlRewriter.Commands
+﻿namespace ParTech.Modules.UrlRewriter.Commands
 {
+    using ParTech.Modules.UrlRewriter.Events;
+    using Sitecore;
+    using Sitecore.Eventing;
+    using Sitecore.Events;
+    using Sitecore.Shell.Framework.Commands;
+    using Sitecore.Web.UI.Sheer;
+
     /// <summary>
     /// Clear the URL Rewriter cache by adding a ClearCacheEvent to the EventQueue.
     /// </summary>
@@ -39,7 +38,7 @@ namespace ParTech.Modules.UrlRewriter.Commands
                 Event.RaiseEvent("urlrewriter:clearcache", new ClearCacheEventArgs(new ClearCacheEvent()));
 
                 // Add a ClearCacheEvent to the EventQueue to clear the cache on all instances.
-                Sitecore.Eventing.EventManager.QueueEvent<ClearCacheEvent>(new ClearCacheEvent(), true, false);
+                EventManager.QueueEvent(new ClearCacheEvent(), true, false);
             }
         }
     }

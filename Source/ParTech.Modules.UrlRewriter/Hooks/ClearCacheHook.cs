@@ -1,10 +1,10 @@
-﻿using System;
-using ParTech.Modules.UrlRewriter.Events;
-using Sitecore.Eventing;
-using Sitecore.Events.Hooks;
-
-namespace ParTech.Modules.UrlRewriter.Hooks
+﻿namespace ParTech.Modules.UrlRewriter.Hooks
 {
+    using System;
+    using ParTech.Modules.UrlRewriter.Events;
+    using Sitecore.Eventing;
+    using Sitecore.Events.Hooks;
+
     /// <summary>
     /// Hook that subscribes the ClearCacheEvent to the EventQueue.
     /// </summary>

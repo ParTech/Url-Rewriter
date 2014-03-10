@@ -1,13 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Text.RegularExpressions;
-using Sitecore.Data;
-using Sitecore.Data.Items;
-
-namespace ParTech.Modules.UrlRewriter.Models
+﻿namespace ParTech.Modules.UrlRewriter.Models
 {
+    using System.Text.RegularExpressions;
+    using Sitecore.Data;
+    using Sitecore.Data.Items;
+
     /// <summary>
     /// Represents a domain rewriting rule.
     /// </summary>

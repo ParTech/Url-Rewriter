@@ -1,11 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using Sitecore.Diagnostics;
-
-namespace ParTech.Modules.UrlRewriter
+﻿namespace ParTech.Modules.UrlRewriter
 {
+    using Sitecore.Diagnostics;
+
     /// <summary>
     /// Provides methods for writing messages to the Sitecore log.
     /// </summary>

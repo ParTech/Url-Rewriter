@@ -1,9 +1,9 @@
-﻿using System;
-using ParTech.Modules.UrlRewriter.Pipelines;
-using Sitecore.Events;
-
-namespace ParTech.Modules.UrlRewriter.Events
+﻿namespace ParTech.Modules.UrlRewriter.Events
 {
+    using System;
+    using ParTech.Modules.UrlRewriter.Pipelines;
+    using Sitecore.Events;
+
     /// <summary>
     /// Handles cache clearing for the URL Rewriter.
     /// </summary>

@@ -1,19 +1,23 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Web;
-using Sitecore.Pipelines.GetContentEditorWarnings;
-
-namespace ParTech.Modules.UrlRewriter.Pipelines
+﻿namespace ParTech.Modules.UrlRewriter.Pipelines
 {
+    using System.Linq;
+    using System.Web;
+    using Sitecore.Pipelines.GetContentEditorWarnings;
+
     /// <summary>
     /// Implements an instruction manual on rewrite rules by adding Content Editor warnings when editing rewrite rule items.
     /// </summary>
     public class ApplyHelpNotifications
     {
-        private readonly string urlHelpHideStateCookieName = "url-rewrite-help-hide";
+        /// <summary>
+        /// The cookie name for the cookie that tracks the state of the hostname rewrite rule instructions.
+        /// </summary>
         private readonly string hostNameHelpHideStateCookieName = "hostname-rewrite-help-hide";
+
+        /// <summary>
+        /// The cookie name for the cookie that tracks the state of the url rewrite rule instructions.
+        /// </summary>
+        private readonly string urlHelpHideStateCookieName = "url-rewrite-help-hide";
 
         /// <summary>
         /// Process the pipeline processor.

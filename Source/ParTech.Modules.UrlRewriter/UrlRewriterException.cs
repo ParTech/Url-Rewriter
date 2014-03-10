@@ -1,10 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-
-namespace ParTech.Modules.UrlRewriter
+﻿namespace ParTech.Modules.UrlRewriter
 {
+    using System;
+
     /// <summary>
     /// Represents an exception thrown by the Url Rewriter module.
     /// </summary>
@@ -14,7 +11,6 @@ namespace ParTech.Modules.UrlRewriter
         /// Initializes a new instance of the <see cref="UrlRewriterException" /> class.
         /// </summary>
         public UrlRewriterException()
-            : base()
         {
         }
 
