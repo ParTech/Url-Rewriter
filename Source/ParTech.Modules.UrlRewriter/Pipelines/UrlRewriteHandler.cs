@@ -88,6 +88,9 @@
                 return;
             }
 
+            // Remember that the rewrite rules are loaded so we don't load them again during the lifecycle of the application.
+            rewriteRulesLoaded = true;
+
             // Verify that we can access the context database.
             if (Context.Database == null)
             {
@@ -108,9 +111,6 @@
             rulesFolder.Axes.GetDescendants()
                 .ToList()
                 .ForEach(this.AddRewriteRule);
-
-            // Remember that the rewrite rules are loaded so we don't load them again during the lifecycle of the application.
-            rewriteRulesLoaded = true;
 
             Logging.LogInfo(string.Format("Cached {0} URL rewrite rules and {1} hostname rewrite rules.", urlRewriteRulesCache.Count, hostNameRewriteRulesCache.Count), this);
         }
@@ -252,12 +252,16 @@
             bool preserveQueryString = false;
 
             // Use the request URL including the querystring to find a matching URL rewrite rule.
-            UrlRewriteRule rule = urlRewriteRulesCache.FirstOrDefault(x => this.EqualUrl(x.GetSourceUrl(requestUrl), requestUrl, componentsWithQuery));
+            UrlRewriteRule rule = urlRewriteRulesCache
+                .Where(x => x != null)
+                .FirstOrDefault(x => this.EqualUrl(x.GetSourceUrl(requestUrl), requestUrl, componentsWithQuery));
 
             if (rule == null)
             {
                 // No match was found, try to find a match for the URL without querystring.
-                rule = urlRewriteRulesCache.FirstOrDefault(x => this.EqualUrl(x.GetSourceUrl(requestUrl), requestUrl, componentsWithoutQuery));
+                rule = urlRewriteRulesCache
+                    .Where(x => x != null)
+                    .FirstOrDefault(x => this.EqualUrl(x.GetSourceUrl(requestUrl), requestUrl, componentsWithoutQuery));
 
                 preserveQueryString = rule != null;
             }
@@ -296,6 +300,11 @@
         /// <returns></returns>
         private bool EqualUrl(Uri a, Uri b, UriComponents components)
         {
+            if (a == null || b == null)
+            {
+                return false;
+            }
+
             string urlA = a.GetComponents(components, UriFormat.Unescaped);
             string urlB = b.GetComponents(components, UriFormat.Unescaped);
 

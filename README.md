@@ -84,6 +84,9 @@ The settings are commented in that file and don't need further explanation in th
 *1.0.0*
 - Initial release
 
+*1.0.1*
+- Fixed a bug that caused an exception to be thrown during initialization in some instances.
+
 
 ## References
 Blog: http://www.partechit.nl/nl/blog/2014/03/sitecore-url-rewriter-module  
