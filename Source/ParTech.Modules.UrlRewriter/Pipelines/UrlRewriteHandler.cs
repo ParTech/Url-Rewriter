@@ -61,7 +61,7 @@
             }
 
             // Load the rewrite rules from Sitecore into the cache.
-            this.LoadRewriteRules(args);
+            this.LoadRewriteRules();
 
             // Rewrite URL's that contain trailing slashes if configuration allows it.
             this.RewriteTrailingSlash(args);
@@ -78,15 +78,18 @@
         /// <summary>
         /// Load the rewrite rules from Sitecore.
         /// </summary>
-        /// <param name="args">HttpRequest pipeline arguments.</param>
-        private void LoadRewriteRules(HttpRequestArgs args)
+        private void LoadRewriteRules()
         {
-            if (rewriteRulesLoaded)
+            if (rewriteRulesLoaded && urlRewriteRulesCache != null && hostNameRewriteRulesCache != null)
             {
                 // Rules are cached and only loaded once when the pipeline processor is called for the first time.
                 // Skip this method if the rules have already been loaded before.
                 return;
             }
+
+            // Ensure the cache objects are never null.
+            urlRewriteRulesCache = new List<UrlRewriteRule>();
+            hostNameRewriteRulesCache = new List<HostNameRewriteRule>();
 
             // Remember that the rewrite rules are loaded so we don't load them again during the lifecycle of the application.
             rewriteRulesLoaded = true;
