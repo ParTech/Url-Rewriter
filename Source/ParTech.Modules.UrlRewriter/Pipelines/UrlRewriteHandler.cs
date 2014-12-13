@@ -33,6 +33,11 @@
         /// </summary>
         private static bool rewriteRulesLoaded;
 
+        /// <summary>
+        /// The locking object.
+        /// </summary>
+        private static object locking = new object();
+
         #endregion
 
         /// <summary>
@@ -81,54 +86,57 @@
         /// </summary>
         private void LoadRewriteRules()
         {
-            if (rewriteRulesLoaded && urlRewriteRulesCache != null && hostNameRewriteRulesCache != null)
+            lock (locking)
             {
-                // Rules are cached and only loaded once when the pipeline processor is called for the first time.
-                // Skip this method if the rules have already been loaded before.
-                return;
+                if (rewriteRulesLoaded && urlRewriteRulesCache != null && hostNameRewriteRulesCache != null)
+                {
+                    // Rules are cached and only loaded once when the pipeline processor is called for the first time.
+                    // Skip this method if the rules have already been loaded before.
+                    return;
+                }
+
+                // Ensure the cache objects are never null.
+                urlRewriteRulesCache = new List<UrlRewriteRule>();
+                hostNameRewriteRulesCache = new List<HostNameRewriteRule>();
+
+                // Verify that we can access the context database.
+                if (Context.Database == null)
+                {
+                    Logging.LogError("Cannot load URL rewrite rules because the Sitecore context database is not set.", this);
+                    return;
+                }
+
+                // Load the rules folder item from Sitecore and verify that it exists.
+                Item rulesFolder = Context.Database.GetItem(Settings.RulesFolderId);
+
+                if (rulesFolder == null)
+                {
+                    Logging.LogError(string.Format("Cannot load URL rewrite rules folder with ID '{0}' from Sitecore. Verify that it exists.", Settings.RulesFolderId), this);
+                    return;
+                }
+
+                // Load the rewrite entries and add them to the cache.
+                rulesFolder.Axes.GetDescendants()
+                    .ToList()
+                    .ForEach(this.AddRewriteRule);
+
+                // Load the rules from the raw data item with rules table.
+                Item rulesTable = Context.Database.GetItem(Settings.RulesTableItemId);
+
+                if (rulesTable == null)
+                {
+                    Logging.LogInfo(string.Format("Rules table item with ID '{0}' does not exist.", Settings.RulesTableItemId), this);
+                }
+                else
+                {
+                    this.AddRewriteRulesTable(rulesTable[new ID("{4AA2FCD6-B2D7-452F-B4FB-35CB4A35A1B3}")]);
+                }
+
+                Logging.LogInfo(string.Format("Cached {0} URL rewrite rules and {1} hostname rewrite rules.", urlRewriteRulesCache.Count, hostNameRewriteRulesCache.Count), this);
+
+                // Remember that the rewrite rules are loaded so we don't load them again during the lifecycle of the application.
+                rewriteRulesLoaded = true;
             }
-
-            // Ensure the cache objects are never null.
-            urlRewriteRulesCache = new List<UrlRewriteRule>();
-            hostNameRewriteRulesCache = new List<HostNameRewriteRule>();
-
-            // Verify that we can access the context database.
-            if (Context.Database == null)
-            {
-                Logging.LogError("Cannot load URL rewrite rules because the Sitecore context database is not set.", this);
-                return;
-            }
-
-            // Load the rules folder item from Sitecore and verify that it exists.
-            Item rulesFolder = Context.Database.GetItem(Settings.RulesFolderId);
-
-            if (rulesFolder == null)
-            {
-                Logging.LogError(string.Format("Cannot load URL rewrite rules folder with ID '{0}' from Sitecore. Verify that it exists.", Settings.RulesFolderId), this);
-                return;
-            }
-
-            // Load the rewrite entries and add them to the cache.
-            rulesFolder.Axes.GetDescendants()
-                .ToList()
-                .ForEach(this.AddRewriteRule);
-
-            // Load the rules from the raw data item with rules table.
-            Item rulesTable = Context.Database.GetItem(Settings.RulesTableItemId);
-
-            if (rulesTable == null)
-            {
-                Logging.LogInfo(string.Format("Rules table item with ID '{0}' does not exist.", Settings.RulesTableItemId), this);
-            }
-            else
-            {
-                this.AddRewriteRulesTable(rulesTable[new ID("{4AA2FCD6-B2D7-452F-B4FB-35CB4A35A1B3}")]);
-            }
-
-            Logging.LogInfo(string.Format("Cached {0} URL rewrite rules and {1} hostname rewrite rules.", urlRewriteRulesCache.Count, hostNameRewriteRulesCache.Count), this);
-
-            // Remember that the rewrite rules are loaded so we don't load them again during the lifecycle of the application.
-            rewriteRulesLoaded = true;
         }
 
         /// <summary>
