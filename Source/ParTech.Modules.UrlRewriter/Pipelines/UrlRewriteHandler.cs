@@ -7,6 +7,7 @@
     using System.Web;
     using ParTech.Modules.UrlRewriter.Models;
     using Sitecore;
+    using Sitecore.Data;
     using Sitecore.Data.Items;
     using Sitecore.Pipelines.HttpRequest;
 
@@ -91,9 +92,6 @@
             urlRewriteRulesCache = new List<UrlRewriteRule>();
             hostNameRewriteRulesCache = new List<HostNameRewriteRule>();
 
-            // Remember that the rewrite rules are loaded so we don't load them again during the lifecycle of the application.
-            rewriteRulesLoaded = true;
-
             // Verify that we can access the context database.
             if (Context.Database == null)
             {
@@ -115,7 +113,56 @@
                 .ToList()
                 .ForEach(this.AddRewriteRule);
 
+            // Load the rules from the raw data item with rules table.
+            Item rulesTable = Context.Database.GetItem(Settings.RulesTableItemId);
+
+            if (rulesTable == null)
+            {
+                Logging.LogInfo(string.Format("Rules table item with ID '{0}' does not exist.", Settings.RulesTableItemId), this);
+            }
+            else
+            {
+                this.AddRewriteRulesTable(rulesTable[new ID("{4AA2FCD6-B2D7-452F-B4FB-35CB4A35A1B3}")]);
+            }
+
             Logging.LogInfo(string.Format("Cached {0} URL rewrite rules and {1} hostname rewrite rules.", urlRewriteRulesCache.Count, hostNameRewriteRulesCache.Count), this);
+
+            // Remember that the rewrite rules are loaded so we don't load them again during the lifecycle of the application.
+            rewriteRulesLoaded = true;
+        }
+
+        /// <summary>
+        /// Adds the rewrite rules table.
+        /// </summary>
+        /// <param name="data">The data.</param>
+        private void AddRewriteRulesTable(string data)
+        {
+            if (string.IsNullOrWhiteSpace(data))
+            {
+                return;
+            }
+
+            string[] lines = data.Split(new[] { "\r\n" }, StringSplitOptions.RemoveEmptyEntries);
+
+            foreach (string line in lines)
+            {
+                string[] parts = line.Split(new[] { "|>|" }, StringSplitOptions.None);
+                string sourceUrl = parts.First();
+                string targetUrl = parts.Last();
+
+                if (sourceUrl == targetUrl)
+                {
+                    continue;
+                }
+
+                // Add a URL rewrite rule.
+                var rule = new UrlRewriteRule(sourceUrl, targetUrl);
+
+                if (rule.Validate())
+                {
+                    urlRewriteRulesCache.Add(rule);
+                }
+            }
         }
 
         /// <summary>

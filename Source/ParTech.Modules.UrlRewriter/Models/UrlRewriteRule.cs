@@ -40,6 +40,17 @@
         }
 
         /// <summary>
+        /// Initializes a new instance of the <see cref="UrlRewriteRule"/> class.
+        /// </summary>
+        /// <param name="sourceUrl">The source URL.</param>
+        /// <param name="targetUrl">The target URL.</param>
+        public UrlRewriteRule(string sourceUrl, string targetUrl)
+        {
+            this.sourceUrl = sourceUrl;
+            this.targetUrl = targetUrl;
+        }
+
+        /// <summary>
         /// Gets or sets the Sitecore ID of the item containing the data for this model.
         /// </summary>
         public ID ItemId { get; set; }

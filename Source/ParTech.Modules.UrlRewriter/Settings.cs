@@ -133,6 +133,12 @@
         public ID GetID(string name, bool required = true)
         {
             string value = this.GetString(name, required);
+
+            if (string.IsNullOrWhiteSpace(value) && !required)
+            {
+                return ID.Null;
+            }
+
             ID result;
 
             if (!ID.TryParse(value, out result) && required)
@@ -153,6 +159,14 @@
         public static ID RulesFolderId
         {
             get { return settings.GetID("RulesFolderId"); }
+        }
+
+        /// <summary>
+        /// Gets the rules table item identifier.
+        /// </summary>
+        public static ID RulesTableItemId
+        {
+            get { return settings.GetID("RulesTableItemId", false); }
         }
 
         /// <summary>
