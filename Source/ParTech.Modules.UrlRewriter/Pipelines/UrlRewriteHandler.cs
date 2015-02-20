@@ -2,6 +2,8 @@
 {
     using System;
     using System.Collections.Generic;
+    using System.Diagnostics;
+    using System.IO;
     using System.Linq;
     using System.Net;
     using System.Web;
@@ -21,7 +23,7 @@
         /// <summary>
         /// Cache for <see cref="UrlRewriteRule"/> objects.
         /// </summary>
-        private static List<UrlRewriteRule> urlRewriteRulesCache = new List<UrlRewriteRule>();
+        private static Dictionary<string, UrlRewriteRule> urlRewriteRulesCache = new Dictionary<string, UrlRewriteRule>();
 
         /// <summary>
         /// Cache for <see cref="HostNameRewriteRule"/> objects.
@@ -37,7 +39,7 @@
         /// The locking object.
         /// </summary>
         private static object locking = new object();
-
+        
         #endregion
 
         /// <summary>
@@ -96,7 +98,7 @@
                 }
 
                 // Ensure the cache objects are never null.
-                urlRewriteRulesCache = new List<UrlRewriteRule>();
+                urlRewriteRulesCache = new Dictionary<string, UrlRewriteRule>();
                 hostNameRewriteRulesCache = new List<HostNameRewriteRule>();
 
                 // Verify that we can access the context database.
@@ -168,7 +170,16 @@
 
                 if (rule.Validate())
                 {
-                    urlRewriteRulesCache.Add(rule);
+                    sourceUrl = sourceUrl.ToLower();
+
+                    if (!urlRewriteRulesCache.ContainsKey(sourceUrl))
+                    {
+                        urlRewriteRulesCache.Add(sourceUrl, rule);
+                    }
+                }
+                else
+                {
+                    Logging.LogError(string.Concat("Ignored invalid source URL: ", sourceUrl), this);
                 }
             }
         }
@@ -187,7 +198,10 @@
 
                 if (rule.Validate())
                 {
-                    urlRewriteRulesCache.Add(rule);
+                    if (!urlRewriteRulesCache.ContainsKey(rule.SourceUrl))
+                    {
+                        urlRewriteRulesCache.Add(rule.SourceUrl.ToLower(), rule);
+                    }
                 }
             }
             else if (rewriteRuleItem.TemplateID.Equals(ItemIds.Templates.HostNameRewriteRule))
@@ -297,11 +311,24 @@
                 return;
             }
 
-            // Prepare flags to retrieve the URL strings from Uri objects.
-            var componentsWithoutQuery = UriComponents.Scheme | UriComponents.Host | UriComponents.Path;
-            var componentsWithQuery = componentsWithoutQuery | UriComponents.Query;
+            Uri requestUri = args.Context.Request.Url;
+            string rawUrl = string.Concat(requestUri.Scheme, "://", requestUri.Host, args.Context.Request.RawUrl);
 
-            Uri requestUrl = args.Context.Request.Url;
+            // The request URL might already be rewritten by Sitecore to remove the language code.
+            // We need the original request URL.
+            if (!requestUri.PathAndQuery.Equals(args.Context.Request.RawUrl, StringComparison.OrdinalIgnoreCase))
+            {
+                requestUri = new Uri(rawUrl);
+            }
+
+            // Get request URL and query as string.
+            string requestUrl = requestUri.ToString().ToLower();
+
+            string[] querySplit = requestUrl.Split('?');
+            string requestUrlWithoutQuery = querySplit.First();
+            string requestQuery = querySplit.Length > 1
+                ? querySplit[1]
+                : null;
 
             // If we found a matching URL rewrite rule for the request URL including its querystring,
             // we will rewrite to the exact target URL and dispose the request querystring.
@@ -310,16 +337,20 @@
             bool preserveQueryString = false;
 
             // Use the request URL including the querystring to find a matching URL rewrite rule.
-            UrlRewriteRule rule = urlRewriteRulesCache
-                .Where(x => x != null)
-                .FirstOrDefault(x => this.EqualUrl(x.GetSourceUrl(requestUrl), requestUrl, componentsWithQuery));
+            UrlRewriteRule rule = null;
+
+            if (urlRewriteRulesCache.ContainsKey(requestUrl))
+            {
+                rule = urlRewriteRulesCache[requestUrl];
+            }
 
             if (rule == null)
             {
                 // No match was found, try to find a match for the URL without querystring.
-                rule = urlRewriteRulesCache
-                    .Where(x => x != null)
-                    .FirstOrDefault(x => this.EqualUrl(x.GetSourceUrl(requestUrl), requestUrl, componentsWithoutQuery));
+                if (urlRewriteRulesCache.ContainsKey(requestUrlWithoutQuery))
+                {
+                    rule = urlRewriteRulesCache[requestUrlWithoutQuery];
+                }
 
                 preserveQueryString = rule != null;
             }
@@ -332,14 +363,8 @@
 
             // Set the target URL with or without the original request's querystring.
             string targetUrl = preserveQueryString
-                ? string.Concat(rule.GetTargetUrl(requestUrl).GetComponents(componentsWithoutQuery, UriFormat.Unescaped), requestUrl.Query)
-                : rule.GetTargetUrl(requestUrl).GetComponents(componentsWithQuery, UriFormat.Unescaped);
-
-            if (Settings.LogRewrites)
-            {
-                // Write an entry to the Sitecore log informing about the rewrite.
-                Logging.LogInfo(string.Format("URL rewrite rule '{0}' caused the requested URL '{1}' to be rewritten to '{2}'", rule.ItemId, requestUrl.AbsoluteUri, targetUrl), this);
-            }
+                ? string.Concat(rule.TargetUrl, "?", requestQuery)
+                : rule.TargetUrl;
 
             // Return a permanent redirect to the target URL.
             this.Redirect(targetUrl, args.Context);
@@ -348,26 +373,6 @@
         #endregion
 
         #region Helper methods
-
-        /// <summary>
-        /// Compares the components of two URL's and returns true if they are equal.
-        /// </summary>
-        /// <param name="a">First URL to compare.</param>
-        /// <param name="b">Second URL to compare.</param>
-        /// <param name="components">The URI components to compare.</param>
-        /// <returns></returns>
-        private bool EqualUrl(Uri a, Uri b, UriComponents components)
-        {
-            if (a == null || b == null)
-            {
-                return false;
-            }
-
-            string urlA = a.GetComponents(components, UriFormat.Unescaped);
-            string urlB = b.GetComponents(components, UriFormat.Unescaped);
-
-            return urlA.Equals(urlB, StringComparison.InvariantCultureIgnoreCase);
-        }
 
         /// <summary>
         /// Redirect to the URL using HTTP status code 301 (permanent redirect).
@@ -406,7 +411,10 @@
             // CHeck if the context site is in the list of ignored sites.
             bool ignoredSite = Settings.IgnoreForSites.Contains(Context.GetSiteName().ToLower());
 
-            return !getRequest || coreDatabase || ignoredSite;
+            string rawUrl = httpContext.Request.RawUrl;
+            bool ignorePages = rawUrl.StartsWith("/mvc/", StringComparison.OrdinalIgnoreCase) || rawUrl.StartsWith("/~/media/", StringComparison.OrdinalIgnoreCase);
+
+            return !getRequest || coreDatabase || ignoredSite || ignorePages;
         }
 
         #endregion

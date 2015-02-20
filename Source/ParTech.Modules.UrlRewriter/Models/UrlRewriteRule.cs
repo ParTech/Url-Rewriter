@@ -10,24 +10,6 @@
     public class UrlRewriteRule
     {
         /// <summary>
-        /// Sitecore field value for the source URL.
-        /// </summary>
-        /// <remarks>
-        /// Expected format is a relative or absolute URL (including protocol and hostname) and optionally a querystring.
-        /// e.g. /myfolder/mypage.html or http://www.mydomain.com/myfolder/mypage.html
-        /// </remarks>
-        private readonly string sourceUrl;
-
-        /// <summary>
-        /// Sitecore field value for the target URL.
-        /// </summary>
-        /// <remarks>
-        /// Expected format is a relative or absolute URL (including protocol and hostname) and optionally a querystring.
-        /// e.g. /myfolder/mypage.html or http://www.mydomain.com/myfolder/mypage.html
-        /// </remarks>
-        private readonly string targetUrl;
-
-        /// <summary>
         /// Initializes a new instance of the <see cref="UrlRewriteRule" /> class.
         /// </summary>
         /// <param name="item">Sitecore item based on a URL Rewrite Rule template.</param>
@@ -35,8 +17,8 @@
         {
             this.ItemId = item.ID;
 
-            this.sourceUrl = item[ItemIds.Fields.SourceUrl];
-            this.targetUrl = item[ItemIds.Fields.TargetUrl];
+            this.SourceUrl = item[ItemIds.Fields.SourceUrl];
+            this.TargetUrl = item[ItemIds.Fields.TargetUrl];
         }
 
         /// <summary>
@@ -46,8 +28,8 @@
         /// <param name="targetUrl">The target URL.</param>
         public UrlRewriteRule(string sourceUrl, string targetUrl)
         {
-            this.sourceUrl = sourceUrl;
-            this.targetUrl = targetUrl;
+            this.SourceUrl = sourceUrl;
+            this.TargetUrl = targetUrl;
         }
 
         /// <summary>
@@ -56,13 +38,23 @@
         public ID ItemId { get; set; }
 
         /// <summary>
+        /// Gets or sets the source URL as string.
+        /// </summary>
+        public string SourceUrl { get; set; }
+
+        /// <summary>
+        /// Gets or sets the target URL as string.
+        /// </summary>
+        public string TargetUrl { get; set; }
+
+        /// <summary>
         /// Gets the source URL; the URL that needs to be rewritten.
         /// </summary>
         /// <param name="requestUrl">The request URL that is being rewritten.</param>
         /// <returns></returns>
-        public Uri GetSourceUrl(Uri requestUrl)
+        public Uri GetSourceUri(Uri requestUrl)
         {
-            string absoluteSourceUrl = this.GetAbsoluteUrl(this.sourceUrl, requestUrl);
+            string absoluteSourceUrl = this.GetAbsoluteUrl(this.SourceUrl, requestUrl);
 
             if (!Uri.IsWellFormedUriString(absoluteSourceUrl, UriKind.Absolute))
             {
@@ -78,9 +70,9 @@
         /// </summary>
         /// <param name="requestUrl">The request URL that is being rewritten.</param>
         /// <returns></returns>
-        public Uri GetTargetUrl(Uri requestUrl)
+        public Uri GetTargetUri(Uri requestUrl)
         {
-            string absoluteTargetUrl = this.GetAbsoluteUrl(this.targetUrl, requestUrl);
+            string absoluteTargetUrl = this.GetAbsoluteUrl(this.TargetUrl, requestUrl);
 
             if (!Uri.IsWellFormedUriString(absoluteTargetUrl, UriKind.Absolute))
             {
@@ -98,26 +90,26 @@
         public bool Validate()
         {
             // Ensure that the field values are not empty.
-            if (string.IsNullOrEmpty(this.sourceUrl))
+            if (string.IsNullOrEmpty(this.SourceUrl))
             {
                 Logging.LogError(string.Format("URL rewrite rule with ID '{0}' is invalid because the Source URL field is empty.", this.ItemId), this);
                 return false;
             }
 
-            if (string.IsNullOrEmpty(this.targetUrl))
+            if (string.IsNullOrEmpty(this.TargetUrl))
             {
                 Logging.LogError(string.Format("URL rewrite rule with ID '{0}' is invalid because the Target URL field is empty.", this.ItemId), this);
                 return false;
             }
 
             // Ensure that the URL's are well formed and can be parsed to Uri objects.
-            if (!Uri.IsWellFormedUriString(this.sourceUrl, UriKind.RelativeOrAbsolute))
+            if (!Uri.IsWellFormedUriString(this.SourceUrl, UriKind.RelativeOrAbsolute))
             {
                 Logging.LogError(string.Format("URL rewrite rule with ID '{0}' is invalid because the Source URL field contains an invalid URL.", this.ItemId), this);
                 return false;
             }
 
-            if (!Uri.IsWellFormedUriString(this.targetUrl, UriKind.RelativeOrAbsolute))
+            if (!Uri.IsWellFormedUriString(this.TargetUrl, UriKind.RelativeOrAbsolute))
             {
                 Logging.LogError(string.Format("URL rewrite rule with ID '{0}' is invalid because the Target URL field contains an invalid URL.", this.ItemId), this);
                 return false;
