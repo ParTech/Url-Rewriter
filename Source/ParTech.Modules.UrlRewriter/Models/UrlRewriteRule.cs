@@ -103,6 +103,25 @@
             }
 
             // Ensure that the URL's are well formed and can be parsed to Uri objects.
+            try
+            {
+                var test = new Uri(this.SourceUrl);
+            }
+            catch
+            {
+                return false;
+            }
+
+            try
+            {
+                var test = new Uri(this.TargetUrl);
+            }
+            catch
+            {
+                return false;
+            }
+
+            /*
             if (!Uri.IsWellFormedUriString(this.SourceUrl, UriKind.RelativeOrAbsolute))
             {
                 Logging.LogError(string.Format("URL rewrite rule with ID '{0}' is invalid because the Source URL field contains an invalid URL.", this.ItemId), this);
@@ -113,7 +132,7 @@
             {
                 Logging.LogError(string.Format("URL rewrite rule with ID '{0}' is invalid because the Target URL field contains an invalid URL.", this.ItemId), this);
                 return false;
-            }
+            }*/
 
             return true;
         }
