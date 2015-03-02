@@ -327,7 +327,7 @@
             string[] querySplit = requestUrl.Split('?');
             string requestUrlWithoutQuery = querySplit.First();
             string requestQuery = querySplit.Length > 1
-                ? querySplit[1]
+                ? requestUri.ToString().Split('?')[1]   // Split again to get case sensitive value
                 : null;
 
             // If we found a matching URL rewrite rule for the request URL including its querystring,
